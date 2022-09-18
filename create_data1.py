@@ -12,8 +12,8 @@ def get_data_list(infodata_path, list_path, zhvoice_path):
     with open(infodata_path, 'r', encoding='utf-8') as f:
         lines = f.readlines()
 
-    f_train = open(os.path.join(list_path, 'train_list.txt'), 'w')
-    f_test = open(os.path.join(list_path, 'test_list.txt'), 'w')
+    f_train = open(os.path.join(list_path, 'train_list1.txt'), 'w')
+    f_test = open(os.path.join(list_path, 'test_list1.txt'), 'w')
 
     sound_sum = 0
     speakers = []
@@ -29,25 +29,28 @@ def get_data_list(infodata_path, list_path, zhvoice_path):
             speakers.append(speaker)
         label = speakers_dict[speaker]
         sound_path = os.path.join(zhvoice_path, line['index'])
+        print(sound_path)
         save_path = "%s.wav" % sound_path[:-4]
-        print('处理第 %d 条数据' % sound_sum)
+        print('%d 获取原始MP3路径: %s \t 转成wav路径: %s' % (sound_sum, sound_path, save_path))
         if not os.path.exists(save_path):
             try:
                 wav = AudioSegment.from_mp3(sound_path)
+
                 wav.export(save_path, format="wav")
                 os.remove(sound_path)
+                print('转换结束，删除原始音频 %s %d' % (sound_path, sound_sum))
             except Exception as e:
-                print('数据出错：%s, 信息：%s' % (sound_path, e))
+                print('数据出错：%s, 信息：%s %d' % (sound_path, e, sound_sum))
                 continue
-        if sound_sum % 200 == 0:
-            f_test.write('%s\t%d\n' % (save_path.replace('\\', '/'), label))
-        else:
-            f_train.write('%s\t%d\n' % (save_path.replace('\\', '/'), label))
+        # if sound_sum % 200 == 0:
+        #     f_test.write('%s\t%d\n' % (save_path.replace('\\', '/'), label))
+        # else:
+        #     f_train.write('%s\t%d\n' % (save_path.replace('\\', '/'), label))
         sound_sum += 1
 
     f_test.close()
     f_train.close()
-    print('转换结束，共转换： %d' % sound_sum)
+    print('转换结束，共转换： %d 段音频' % sound_sum)
 
 
 # 删除错误音频
@@ -69,6 +72,7 @@ def remove_error_audio(data_list_path):
 
 
 if __name__ == '__main__':
-    get_data_list('dataset/zhvoice/text/infodata.json', 'dataset', 'C://jupyterNoteBook//VoiceprintRecognition-Pytorch//dataset//zhvoice')
-    remove_error_audio('dataset/train_list.txt')
-    remove_error_audio('dataset/test_list.txt')
+    get_data_list('dataset/zhvoice/text/infodata1.json', 'dataset',
+                  'C://jupyterNoteBook//VoiceprintRecognition-Pytorch//dataset//zhvoice')
+    # remove_error_audio('dataset/train_list1.txt')
+    # remove_error_audio('dataset/test_list1.txt')
