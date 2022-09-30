@@ -18,7 +18,7 @@ add_arg('use_model',        str,    'ecapa_tdnn',             '所使用的模�
 add_arg('num_speakers',     int,    3242,                     '分类的类别数量')
 add_arg('feature_method',   str,    'melspectrogram',         '音频特征提取方法', choices=['melspectrogram', 'spectrogram'])
 add_arg('list_path',        str,    'dataset/test_list.txt',  '测试数据的数据列表路径')
-add_arg('resume',           str,    'models/',                '模型文件夹路径')
+add_arg('resume',           str,    'models/ecapa_tdnn_mel_visu/',                '模型文件夹路径')
 args = parser.parse_args()
 print_arguments(args)
 

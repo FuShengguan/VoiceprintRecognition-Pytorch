@@ -1,0 +1,114 @@
+G:\envs\py38\python.exe C:/jupyterNoteBook/VoiceprintRecognition-Pytorch/train.py 
+-----------  Configuration Arguments -----------
+augment_conf_path: configs/augment.yml
+batch_size: 64
+feature_method: spectrogram
+gpus: 0
+learning_rate: 0.001
+num_epoch: 30
+num_speakers: 3242
+num_workers: 8
+pretrained_model: None
+resume: None
+save_model_dir: models/
+test_list_path: dataset/test_list.txt
+train_list_path: dataset/train_list.txt
+use_model: ecapa_tdnn
+------------------------------------------------
+----------------------------------------------------------------
+        Layer (type)               Output Shape         Param #
+================================================================
+            Conv1d-1              [-1, 512, 98]         514,560
+       BatchNorm1d-2              [-1, 512, 98]           1,024
+      Conv1dReluBn-3              [-1, 512, 98]               0
+            Conv1d-4              [-1, 512, 98]         262,144
+       BatchNorm1d-5              [-1, 512, 98]           1,024
+      Conv1dReluBn-6              [-1, 512, 98]               0
+            Conv1d-7               [-1, 64, 98]          12,288
+       BatchNorm1d-8               [-1, 64, 98]             128
+            Conv1d-9               [-1, 64, 98]          12,288
+      BatchNorm1d-10               [-1, 64, 98]             128
+           Conv1d-11               [-1, 64, 98]          12,288
+      BatchNorm1d-12               [-1, 64, 98]             128
+           Conv1d-13               [-1, 64, 98]          12,288
+      BatchNorm1d-14               [-1, 64, 98]             128
+           Conv1d-15               [-1, 64, 98]          12,288
+      BatchNorm1d-16               [-1, 64, 98]             128
+           Conv1d-17               [-1, 64, 98]          12,288
+      BatchNorm1d-18               [-1, 64, 98]             128
+           Conv1d-19               [-1, 64, 98]          12,288
+      BatchNorm1d-20               [-1, 64, 98]             128
+ Res2Conv1dReluBn-21              [-1, 512, 98]               0
+           Conv1d-22              [-1, 512, 98]         262,144
+      BatchNorm1d-23              [-1, 512, 98]           1,024
+     Conv1dReluBn-24              [-1, 512, 98]               0
+           Linear-25                  [-1, 256]         131,328
+           Linear-26                  [-1, 512]         131,584
+       SE_Connect-27              [-1, 512, 98]               0
+           Conv1d-28              [-1, 512, 98]         262,144
+      BatchNorm1d-29              [-1, 512, 98]           1,024
+     Conv1dReluBn-30              [-1, 512, 98]               0
+           Conv1d-31               [-1, 64, 98]          12,288
+      BatchNorm1d-32               [-1, 64, 98]             128
+           Conv1d-33               [-1, 64, 98]          12,288
+      BatchNorm1d-34               [-1, 64, 98]             128
+           Conv1d-35               [-1, 64, 98]          12,288
+      BatchNorm1d-36               [-1, 64, 98]             128
+           Conv1d-37               [-1, 64, 98]          12,288
+      BatchNorm1d-38               [-1, 64, 98]             128
+           Conv1d-39               [-1, 64, 98]          12,288
+      BatchNorm1d-40               [-1, 64, 98]             128
+           Conv1d-41               [-1, 64, 98]          12,288
+      BatchNorm1d-42               [-1, 64, 98]             128
+           Conv1d-43               [-1, 64, 98]          12,288
+      BatchNorm1d-44               [-1, 64, 98]             128
+ Res2Conv1dReluBn-45              [-1, 512, 98]               0
+           Conv1d-46              [-1, 512, 98]         262,144
+      BatchNorm1d-47              [-1, 512, 98]           1,024
+     Conv1dReluBn-48              [-1, 512, 98]               0
+           Linear-49                  [-1, 256]         131,328
+           Linear-50                  [-1, 512]         131,584
+       SE_Connect-51              [-1, 512, 98]               0
+           Conv1d-52              [-1, 512, 98]         262,144
+      BatchNorm1d-53              [-1, 512, 98]           1,024
+     Conv1dReluBn-54              [-1, 512, 98]               0
+           Conv1d-55               [-1, 64, 98]          12,288
+      BatchNorm1d-56               [-1, 64, 98]             128
+           Conv1d-57               [-1, 64, 98]          12,288
+      BatchNorm1d-58               [-1, 64, 98]             128
+           Conv1d-59               [-1, 64, 98]          12,288
+      BatchNorm1d-60               [-1, 64, 98]             128
+           Conv1d-61               [-1, 64, 98]          12,288
+      BatchNorm1d-62               [-1, 64, 98]             128
+           Conv1d-63               [-1, 64, 98]          12,288
+      BatchNorm1d-64               [-1, 64, 98]             128
+           Conv1d-65               [-1, 64, 98]          12,288
+      BatchNorm1d-66               [-1, 64, 98]             128
+           Conv1d-67               [-1, 64, 98]          12,288
+      BatchNorm1d-68               [-1, 64, 98]             128
+ Res2Conv1dReluBn-69              [-1, 512, 98]               0
+           Conv1d-70              [-1, 512, 98]         262,144
+      BatchNorm1d-71              [-1, 512, 98]           1,024
+     Conv1dReluBn-72              [-1, 512, 98]               0
+           Linear-73                  [-1, 256]         131,328
+           Linear-74                  [-1, 512]         131,584
+       SE_Connect-75              [-1, 512, 98]               0
+           Conv1d-76             [-1, 1536, 98]       2,360,832
+           Conv1d-77              [-1, 128, 98]         196,736
+           Conv1d-78             [-1, 1536, 98]         198,144
+AttentiveStatsPool-79                 [-1, 3072]               0
+      BatchNorm1d-80                 [-1, 3072]           6,144
+           Linear-81                  [-1, 192]         590,016
+      BatchNorm1d-82                  [-1, 192]             384
+        EcapaTdnn-83                  [-1, 192]               0
+          Dropout-84                  [-1, 192]               0
+================================================================
+Total params: 6,496,320
+Trainable params: 6,496,320
+Non-trainable params: 0
+----------------------------------------------------------------
+Input size (MB): 0.08
+Forward/backward pass size (MB): 14.81
+Params size (MB): 24.78
+Estimated Total Size (MB): 39.67
+----------------------------------------------------------------

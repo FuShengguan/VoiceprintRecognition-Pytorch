@@ -14,10 +14,10 @@ from utils.utility import add_arguments, print_arguments
 parser = argparse.ArgumentParser(description=__doc__)
 add_arg = functools.partial(add_arguments, argparser=parser)
 add_arg('use_model',        str,    'ecapa_tdnn',             '所使用的模型')
-add_arg('threshold',        float,   0.5,                     '判断是否为同一个人的阈值')
+add_arg('threshold',        float,   0.6,                     '判断是否为同一个人的阈值')
 add_arg('audio_db',         str,    'audio_db',               '音频库的路径')
 add_arg('feature_method',   str,    'melspectrogram',         '音频特征提取方法', choices=['melspectrogram', 'spectrogram'])
-add_arg('resume',           str,    'models/',                '模型文件夹路径')
+add_arg('resume',           str,    'models/ecapa_tdnn_melspectrogram',                '模型文件夹路径')
 args = parser.parse_args()
 print_arguments(args)
 
@@ -74,6 +74,7 @@ def recognition(path):
     name = ''
     pro = 0
     feature = infer(path)[0]
+    # 遍历数据库计算余弦相似度
     for i, person_f in enumerate(person_feature):
         dist = np.dot(feature, person_f) / (np.linalg.norm(feature) * np.linalg.norm(person_f))
         if dist > pro:
