@@ -1,27 +1,27 @@
+# coding=utf-8
 import argparse
 import functools
 import os
 
 import numpy as np
 import torch
-from torch.utils.data import DataLoader
 import torch.nn.functional as F
+from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from modules.ecapa_tdnn import EcapaTdnn, SpeakerIdetification
 from data_utils.reader import CustomDataset, collate_fn
+from modules.ecapa_tdnn import EcapaTdnn, SpeakerIdetification
 from utils.utility import add_arguments, print_arguments, cal_accuracy_threshold
 
 parser = argparse.ArgumentParser(description=__doc__)
 add_arg = functools.partial(add_arguments, argparser=parser)
-add_arg('use_model',        str,    'ecapa_tdnn',             '所使用的模型')
-add_arg('num_speakers',     int,    3242,                     '分类的类别数量')
-add_arg('feature_method',   str,    'melspectrogram',         '音频特征提取方法', choices=['melspectrogram', 'spectrogram'])
-add_arg('list_path',        str,    'dataset/test_list.txt',  '测试数据的数据列表路径')
-add_arg('resume',           str,    'models/ecapa_tdnn_mel_visu/',                '模型文件夹路径')
+add_arg('use_model', str, 'ecapa_tdnn', '所使用的模型')
+add_arg('num_speakers', int, 3242, '分类的类别数量')
+add_arg('feature_method', str, 'spectrogram', '音频特征提取方法', choices=['melspectrogram', 'spectrogram'])
+add_arg('list_path', str, 'dataset/test_list.txt', '测试数据的数据列表路径')
+add_arg('resume', str, 'models/ecapa_spec_noise_visu/', '模型文件夹路径')
 args = parser.parse_args()
 print_arguments(args)
-
 
 dataset = CustomDataset(data_list_path=None, feature_method=args.feature_method)
 # 获取模型

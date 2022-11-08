@@ -16,7 +16,7 @@ add_arg('audio_path1',      str,    'audio/a_1.wav',          '预测第一个�
 add_arg('audio_path2',      str,    'audio/a_2.wav',          '预测第二个音频')
 add_arg('threshold',        float,   0.5,                     '判断是否为同一个人的阈值')
 add_arg('feature_method',   str,    'melspectrogram',         '音频特征提取方法', choices=['melspectrogram', 'spectrogram'])
-add_arg('resume',           str,    'models/ecapa_tdnn_melspectrogram',                '模型文件夹路径')
+add_arg('resume',           str,    'models/ecapa_tdnn_mel_visu',                '模型文件夹路径')
 args = parser.parse_args()
 print_arguments(args)
 

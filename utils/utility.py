@@ -1,3 +1,4 @@
+# coding=utf-8
 import distutils.util
 
 import numpy as np
@@ -49,4 +50,3 @@ def cal_accuracy(y_score, y_true, threshold=0.5):
 # 计算对角余弦值
 def cosin_metric(x1, x2):
     return np.dot(x1, x2) / (np.linalg.norm(x1) * np.linalg.norm(x2))
-

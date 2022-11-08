@@ -7,37 +7,37 @@ from datetime import datetime, timedelta
 import numpy as np
 import torch
 import yaml
-from torch.utils.data import DataLoader
 from torch.nn import DataParallel
 from torch.optim.lr_scheduler import CosineAnnealingLR
+from torch.utils.data import DataLoader
 from torchsummary import summary
 from visualdl import LogWriter
 
-from modules.loss import AAMLoss
-from modules.ecapa_tdnn import EcapaTdnn, SpeakerIdetification
-from data_utils.reader import CustomDataset, collate_fn
 from data_utils.noise_perturb import NoisePerturbAugmentor
+from data_utils.reader import CustomDataset, collate_fn
+from data_utils.spec_augment import SpecAugmentor
 from data_utils.speed_perturb import SpeedPerturbAugmentor
 from data_utils.volume_perturb import VolumePerturbAugmentor
-from data_utils.spec_augment import SpecAugmentor
+from modules.ecapa_tdnn import EcapaTdnn, SpeakerIdetification
+from modules.loss import AAMLoss
 from utils.utility import add_arguments, print_arguments
 
 parser = argparse.ArgumentParser(description=__doc__)
 add_arg = functools.partial(add_arguments, argparser=parser)
-add_arg('gpus',             str,    '0',                      '训练使用的GPU序号，使用英文逗号,隔开，如：0,1')
-add_arg('use_model',        str,    'ecapa_tdnn',             '所使用的模型')
-add_arg('batch_size',       int,    64,                       '训练的批量大小')
-add_arg('num_workers',      int,    8,                        '读取数据的线程数量')
-add_arg('num_epoch',        int,    30,                       '训练的轮数')
-add_arg('num_speakers',     int,    3242,                     '分类的类别数量')
-add_arg('learning_rate',    float,  1e-3,                     '初始学习率的大小')
-add_arg('train_list_path',  str,    'dataset/train_list.txt', '训练数据的数据列表路径')
-add_arg('test_list_path',   str,    'dataset/test_list.txt',  '测试数据的数据列表路径')
-add_arg('save_model_dir',   str,    'models/',                '模型保存的路径')
-add_arg('feature_method',   str,    'melspectrogram',         '音频特征提取方法', choices=['melspectrogram', 'spectrogram'])
-add_arg('augment_conf_path',str,    'configs/augment.yml',    '数据增强的配置文件，为json格式')
-add_arg('resume',           str,    'models/ecapa_tdnn_melspectrogram',                     '恢复训练的模型文件夹，当为None则不使用恢复模型')
-add_arg('pretrained_model', str,    None,                     '预训练模型的模型文件夹，当为None则不使用预训练模型')
+add_arg('gpus', str, '0', '训练使用的GPU序号，使用英文逗号,隔开，如：0,1')
+add_arg('use_model', str, 'ecapa_tdnn', '所使用的模型')
+add_arg('batch_size', int, 64, '训练的批量大小')
+add_arg('num_workers', int, 8, '读取数据的线程数量')
+add_arg('num_epoch', int, 30, '训练的轮数')
+add_arg('num_speakers', int, 3242, '分类的类别数量')
+add_arg('learning_rate', float, 1e-3, '初始学习率的大小')
+add_arg('train_list_path', str, 'dataset/train_list.txt', '训练数据的数据列表路径')
+add_arg('test_list_path', str, 'dataset/test_list.txt', '测试数据的数据列表路径')
+add_arg('save_model_dir', str, 'models/', '模型保存的路径')
+add_arg('feature_method', str, 'spectrogram', '音频特征提取方法', choices=['melspectrogram', 'spectrogram'])
+add_arg('augment_conf_path', str, 'configs/augment.yml', '数据增强的配置文件，为json格式')
+add_arg('resume', str, None, '恢复训练的模型文件夹models/ecapa_tdnn，当为None则不使用恢复模型')
+add_arg('pretrained_model', str, None, '预训练模型的模型文件夹，当为None则不使用预训练模型')
 args = parser.parse_args()
 
 
@@ -80,9 +80,9 @@ def train():
         with open(args.augment_conf_path, encoding="utf-8") as fp:
             configs = yaml.load(fp, Loader=yaml.FullLoader)
         augmentors['noise'] = NoisePerturbAugmentor(**configs['noise'])
-        augmentors['speed'] = SpeedPerturbAugmentor(**configs['speed'])
-        augmentors['volume'] = VolumePerturbAugmentor(**configs['volume'])
-        augmentors['specaug'] = SpecAugmentor(**configs['specaug'])
+        augmentors['speed'] = SpeedPerturbAugmentor(**configs['speed'])  # 随机语速增强
+        augmentors['volume'] = VolumePerturbAugmentor(**configs['volume'])  # 随机音量增强
+        augmentors['specaug'] = SpecAugmentor(**configs['specaug'])  # 时间扭曲、频率掩蔽、时间掩蔽的增强模型
     # 获取数据
     train_dataset = CustomDataset(args.train_list_path,
                                   feature_method=args.feature_method,
@@ -90,11 +90,11 @@ def train():
                                   sr=16000,
                                   chunk_duration=3,
                                   augmentors=augmentors)
-    train_loader = DataLoader(dataset=train_dataset,
-                              batch_size=args.batch_size * len(device_ids),
-                              collate_fn=collate_fn,
-                              shuffle=True,
-                              num_workers=args.num_workers)
+    train_loader = DataLoader(dataset=train_dataset,  # 处理好的所有数据
+                              batch_size=args.batch_size * len(device_ids),  # 批数量
+                              collate_fn=collate_fn,  # 把batch_sampler返回的list结构的一个batch的样本打包成一个tensor的结构
+                              shuffle=True,  # 打乱数据
+                              num_workers=args.num_workers)  # 打乱数据
     # 测试数据
     eval_dataset = CustomDataset(args.test_list_path,
                                  feature_method=args.feature_method,
@@ -182,7 +182,8 @@ def train():
             loss_sum.append(loss.item())
             # 多卡训练只使用一个进程打印
             if batch_id % 100 == 0:
-                eta_sec = ((time.time() - start) * 1000) * (sum_batch - (epoch - last_epoch) * len(train_loader) - batch_id)
+                eta_sec = ((time.time() - start) * 1000) * (
+                            sum_batch - (epoch - last_epoch) * len(train_loader) - batch_id)
                 eta_str = str(timedelta(seconds=int(eta_sec / 1000)))
                 print(f'[{datetime.now()}] '
                       f'Train epoch [{epoch}/{args.num_epoch}], '
@@ -199,9 +200,9 @@ def train():
         s = time.time()
         acc = evaluate(model, eval_loader)
         eta_str = str(timedelta(seconds=int(time.time() - s)))
-        print('='*70)
+        print('=' * 70)
         print(f'[{datetime.now()}] Test {epoch}, accuracy: {acc:.5f} time: {eta_str}')
-        print('='*70)
+        print('=' * 70)
         writer.add_scalar('Test/Accuracy', acc, test_step)
         # 记录学习率
         writer.add_scalar('Train/Learning rate', scheduler.get_lr()[0], epoch)
