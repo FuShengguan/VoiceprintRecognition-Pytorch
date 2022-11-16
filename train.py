@@ -184,6 +184,7 @@ def train():
             if batch_id % 100 == 0:
                 eta_sec = ((time.time() - start) * 1000) * (
                             sum_batch - (epoch - last_epoch) * len(train_loader) - batch_id)
+                # 剩余时间
                 eta_str = str(timedelta(seconds=int(eta_sec / 1000)))
                 print(f'[{datetime.now()}] '
                       f'Train epoch [{epoch}/{args.num_epoch}], '
