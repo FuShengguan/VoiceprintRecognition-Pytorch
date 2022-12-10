@@ -26,7 +26,7 @@ api = Api(app)
 parser = argparse.ArgumentParser(description=__doc__)
 add_arg = functools.partial(add_arguments, argparser=parser)
 add_arg('use_model', str, 'ecapa_tdnn', '所使用的模型')
-add_arg('threshold', float, 0.6, '判断是否为同一个人的阈值')
+add_arg('threshold', float, 0.48, '判断是否为同一个人的阈值')
 add_arg('audio_db', str, 'audio_db', '音频库的路径')
 add_arg('feature_method', str, 'melspectrogram', '音频特征提取方法', choices=['melspectrogram', 'spectrogram'])
 add_arg('resume', str, 'C://jupyterNoteBook/VoiceprintRecognition-Pytorch//models//ecapa_mel_noise_visu',
@@ -205,7 +205,7 @@ def distinguish():
         print(f"识别说话的为：{name2}，相似度为：{p}")
         user_id = user_id_list[i]
     else:
-        print("音频库没有该用户的语音")
+        print(f"音频库没有该用户的语音{name2}，相似度为：{p}")
         user_id = 0
     return str(user_id)
 

@@ -15,7 +15,7 @@ from torch.utils import data
 
 # 加载并预处理音频
 def load_audio(audio_path, feature_method='melspectrogram', mode='train', sr=16000, chunk_duration=3, augmentors=None):
-    # 读取音频数据
+    # 读取音频数据，转化为了numpy的格式储存，sr采样率
     wav, sr_ret = librosa.load(audio_path, sr=sr)
     if mode == 'train':
         # 随机裁剪
@@ -53,6 +53,7 @@ def load_audio(audio_path, feature_method='melspectrogram', mode='train', sr=160
         features, _ = librosa.magphase(linear)
     else:
         raise Exception(f'预处理方法 {feature_method} 不存在！')
+    # 功率转dB
     features = librosa.power_to_db(features, ref=1.0, amin=1e-10, top_db=None)
     # 数据增强
     if mode == 'train' and augmentors is not None:
@@ -61,6 +62,7 @@ def load_audio(audio_path, feature_method='melspectrogram', mode='train', sr=160
                 features = augmentor(features)
     # 归一化
     mean = np.mean(features, 0, keepdims=True)
+    # 将输入数组视为扁平化数组，并计算这个一维扁平化数组的标准差
     std = np.std(features, 0, keepdims=True)
     features = (features - mean) / (std + 1e-5)
     return features
@@ -68,6 +70,10 @@ def load_audio(audio_path, feature_method='melspectrogram', mode='train', sr=160
 
 # 数据加载器
 class CustomDataset(data.Dataset):
+    """
+    :chunk_duration：块包含的音频时长默认三秒
+    """
+
     def __init__(self, data_list_path, feature_method='melspectrogram', mode='train', sr=16000, chunk_duration=3, augmentors=None):
         super(CustomDataset, self).__init__()
         # 当预测时不需要获取数据

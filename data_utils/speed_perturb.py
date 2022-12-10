@@ -41,7 +41,10 @@ class SpeedPerturbAugmentor(object):
 
         old_length = wav.shape[0]
         new_length = int(old_length / speed_rate)
+        # arange函数返回一个有终点和起点的固定步长的排列
         old_indices = np.arange(old_length)
+        # linspace用于在线性空间中以均匀步长生成数字序列。
         new_indices = np.linspace(start=0, stop=old_length, num=new_length)
+        # interp主要使用场景为一维线性插值,第二个参数是原值X，第三个参数是原值Y，第一参数是新值X，求新值Y
         wav = np.interp(new_indices, old_indices, wav)
         return wav
